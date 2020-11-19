@@ -1,5 +1,5 @@
 # Applocker-Hardening
-Ultimate Applocker Hardening Confguration Script.
+Ultimate Applocker Hardening Configuration Script.
 
 ## What does this script do?
 - Locks down system resources to bare minumum needed for basic OS functionality
