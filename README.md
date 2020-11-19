@@ -10,11 +10,11 @@ Ultimate Applocker Hardening Configuration Script.
 - [MotiBa/AppLocker](https://github.com/MotiBa/AppLocker)
 - [NSA Cyber Bitlocker Gidance](https://github.com/nsacyber/AppLocker-Guidance)
 
-## Download the required files
+## Download the required files:
 
 Download the required files from the [GitHub Repository](https://github.com/simeononsecurity/Applocker-Hardening)
 
-## How to run the script
+## How to run the script:
 
 **The script may be lauched from the extracted GitHub download like this:**
 ```
