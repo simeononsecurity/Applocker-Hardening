@@ -14,9 +14,16 @@ Ultimate Applocker Hardening Configuration Script.
 
 Download the required files from the [GitHub Repository](https://github.com/simeononsecurity/Applocker-Hardening)
 
-## How to run the script:
-
-**The script may be lauched from the extracted GitHub download like this:**
-```
+## How to run the script
+### Manual Install:
+If manually downloaded, the script must be launched from an administrative powershell in the directory containing all the files from the [GitHub Repository](https://github.com/simeononsecurity/Windows-Optimize-Harden-Debloat)
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force
+Get-ChildItem -Recurse *.ps1 | Unblock-File
 .\sos-applockerhardening.ps1
+```
+### Automated Install:
+The script may be launched from the extracted GitHub download like this:
+```powershell
+iex ((New-Object System.Net.WebClient).DownloadString('https://simeononsecurity.ch/scripts/sosapplocker.ps1'))
 ```
