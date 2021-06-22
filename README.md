@@ -8,7 +8,7 @@ Ultimate Applocker Hardening Configuration Script.
 - [api0cradle/UltimateAppLockerByPassList)](https://github.com/api0cradle/UltimateAppLockerByPassList)
 - [Microsoft Recommended Block Rules](https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-defender-application-control/microsoft-recommended-block-rules)
 - [MotiBa/AppLocker](https://github.com/MotiBa/AppLocker)
-- [NSA Cyber Bitlocker Gidance](https://github.com/nsacyber/AppLocker-Guidance)
+- [NSA Cyber Bitlocker Guidance](https://github.com/nsacyber/AppLocker-Guidance)
 
 ## How to run the script:
 ### Manual Install:
