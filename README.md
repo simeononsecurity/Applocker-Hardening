@@ -2,7 +2,7 @@
 Ultimate Applocker Hardening Configuration Script.
 
 ## What does this script do?
-- Locks down system resources to bare minumum needed for basic OS functionality
+- Locks down system resources to bare minimum needed for basic OS functionality
 
 ## Recommended reading:
 - [api0cradle/UltimateAppLockerByPassList)](https://github.com/api0cradle/UltimateAppLockerByPassList)
