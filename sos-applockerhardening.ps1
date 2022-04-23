@@ -1,10 +1,12 @@
 #Continue on error
-$ErrorActionPreference= 'silentlycontinue'
+$ErrorActionPreference = 'silentlycontinue'
 
 #Require elivation for script run
-#Requires -RunAsAdministrator
 Write-Output "Elevating priviledges for this process"
 do {} until (Elevate-Privileges SeTakeOwnershipPrivilege)
+
+#Set Directory to PSScriptRoot
+if ((Get-Location).Path -NE $PSScriptRoot) { Set-Location $PSScriptRoot }
 
 Write-Host "Installing Applocker Policies"
 ForEach ($Policy in (Get-ChildItem ./Files/).FullName){
