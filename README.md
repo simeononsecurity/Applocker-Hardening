@@ -1,5 +1,6 @@
 # Applocker-Hardening
-Ultimate Applocker Hardening Configuration Script.
+
+The following script is an automation process for installing AppLocker policies in a Windows environment using PowerShell. The script first sets the error handling preference to "silently continue" and elevates the privileges of the current process. It then sets the directory to the location of the script and installs the policies from the Files directory. The AppLocker service is then enabled and started, and the status of the service is checked. Finally, the active AppLocker rule categories are printed and the script tests the block rules for executables in the C:\Windows\System32 directory for the user "Everyone".
 
 ## What does this script do?
 - Locks down system resources to bare minimum needed for basic OS functionality
