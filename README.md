@@ -1,6 +1,6 @@
 # Applocker-Hardening
 
-[![VirusTotal Scan](https://github.com/simeononsecurity/Applocker-Hardening/actions/workflows/virustotal.yml/badge.svg)](https://github.com/simeononsecurity/Applocker-Hardening/actions/workflows/virustotal.yml)
+ [![Sponsor](https://img.shields.io/badge/Sponsor-Click%20Here-ff69b4)](https://github.com/sponsors/simeononsecurity) [![VirusTotal Scan](https://github.com/simeononsecurity/Applocker-Hardening/actions/workflows/virustotal.yml/badge.svg)](https://github.com/simeononsecurity/Applocker-Hardening/actions/workflows/virustotal.yml)
 
 The following script is an automation process for installing AppLocker policies in a Windows environment using PowerShell. The script first sets the error handling preference to "silently continue" and elevates the privileges of the current process. It then sets the directory to the location of the script and installs the policies from the Files directory. The AppLocker service is then enabled and started, and the status of the service is checked. Finally, the active AppLocker rule categories are printed and the script tests the block rules for executables in the C:\Windows\System32 directory for the user "Everyone".
 
