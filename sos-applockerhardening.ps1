@@ -1,27 +1,20 @@
-#Continue on error
-$ErrorActionPreference = 'silentlycontinue'
-
-#Require elivation for script run
-Write-Output "Elevating priviledges for this process"
-do {} until (Elevate-Privileges SeTakeOwnershipPrivilege)
-
-#Set Directory to PSScriptRoot
-if ((Get-Location).Path -NE $PSScriptRoot) { Set-Location $PSScriptRoot }
-
-Write-Host "Installing Applocker Policies"
-ForEach ($Policy in (Get-ChildItem ./Files/).FullName){
-   Set-AppLockerPolicy -XMLPolicy "$Policy" -Merge
+#Requires -Version 5.1
+#Requires -RunAsAdministrator
+[CmdletBinding(SupportsShouldProcess)]
+param(
+    [ValidateSet('Apply','Export','Restore')][string]$Mode = 'Apply',
+    [ValidateSet('AuditOnly','Enabled')][string]$EnforcementMode = 'AuditOnly',
+    [string]$BackupPath = (Join-Path $env:ProgramData ('SoS-AppLocker\' + (Get-Date -Format 'yyyyMMdd-HHmmss-fff') + '.json')),
+    [string[]]$TestPath = @("$env:windir\System32\WindowsPowerShell\v1.0\powershell.exe", "$env:windir\explorer.exe"),
+    [string]$TestUser = 'S-1-1-0'
+)
+$ErrorActionPreference = 'Stop'
+try {
+    Import-Module (Join-Path $PSScriptRoot 'AppLockerHardening.psm1') -Force
+    $confirmation = @{}
+    if ($PSBoundParameters.ContainsKey('Confirm')) { $confirmation['Confirm'] = $PSBoundParameters['Confirm'] }
+    Invoke-AppLockerConfiguration -Mode $Mode -EnforcementMode $EnforcementMode -BackupPath $BackupPath -TestPath $TestPath -TestUser $TestUser -WhatIf:$WhatIfPreference @confirmation
+} catch {
+    Write-Error $_ -ErrorAction Continue
+    exit 1
 }
-
-# Appplocker service running?
-Write-Host "Enabling AppLocker Service"
-Set-Service -Name AppIdsvc -StartupType Automatic
-Start-Service AppIdsvc
-Get-Service -Name AppIdsvc | fl St*
-
-#Print Conf
-Write-Host "Printing AppLocker Active Rule Categories"
-Get-AppLockerPolicy -Local
-
-#Test Block Rules
-#Get-AppLockerPolicy -Local | Test-AppLockerPolicy -Path C:\Windows\System32\*.exe -User Everyone | Where-Object {$_.PolicyDecision -eq "Denied"}

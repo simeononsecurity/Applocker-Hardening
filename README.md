@@ -1,38 +1,58 @@
-# Applocker-Hardening
+# AppLocker Hardening
 
- [![Sponsor](https://img.shields.io/badge/Sponsor-Click%20Here-ff69b4)](https://github.com/sponsors/simeononsecurity) [![VirusTotal Scan](https://github.com/simeononsecurity/Applocker-Hardening/actions/workflows/virustotal.yml/badge.svg)](https://github.com/simeononsecurity/Applocker-Hardening/actions/workflows/virustotal.yml)
+Apply packaged AppLocker rules in audit mode, verify the local and effective policies, and retain a recovery snapshot.
 
-The following script is an automation process for installing AppLocker policies in a Windows environment using PowerShell. The script first sets the error handling preference to "silently continue" and elevates the privileges of the current process. It then sets the directory to the location of the script and installs the policies from the Files directory. The AppLocker service is then enabled and started, and the status of the service is checked. Finally, the active AppLocker rule categories are printed and the script tests the block rules for executables in the C:\Windows\System32 directory for the user "Everyone".
+## Requirements
 
-## What does this script do?
-- Locks down system resources to bare minimum needed for basic OS functionality
+- Elevated Windows PowerShell 5.1 or PowerShell 7 with AppLocker commands available.
+- A Windows edition and build supporting the required AppLocker behavior and Application Identity service.
+- A disposable test system matching the target workload before deployment.
 
-## Recommended reading:
-- [api0cradle/UltimateAppLockerByPassList)](https://github.com/api0cradle/UltimateAppLockerByPassList)
-- [Microsoft Recommended Block Rules](https://docs.microsoft.com/en-us/windows/security/threat-protection/windows-defender-application-control/microsoft-recommended-block-rules)
-- [MotiBa/AppLocker](https://github.com/MotiBa/AppLocker)
-- [NSA Cyber Bitlocker Guidance](https://github.com/nsacyber/AppLocker-Guidance)
+The script requires administrator privileges directly. It no longer relies on an external elevation helper. Domain policy might override local settings and trigger effective-policy verification failures.
 
-## How to run the script:
-### Manual Install:
-If manually downloaded, the script must be launched from an administrative powershell in the directory containing all the files from the [GitHub Repository](https://github.com/simeononsecurity/Applocker-Hardening)
+## Preview and apply
+
 ```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Force
-Get-ChildItem -Recurse *.ps1 | Unblock-File
-.\sos-applockerhardening.ps1
+.\sos-applockerhardening.ps1 -WhatIf
+.\sos-applockerhardening.ps1 -BackupPath C:\Recovery\applocker-before.json
 ```
-### Automated Install:
-The script may be launched from the extracted GitHub download like this:
-```powershell
-iex ((New-Object System.Net.WebClient).DownloadString('https://simeononsecurity.ch/scripts/sosapplocker.ps1'))
-```
-<a href="https://simeononsecurity.ch" target="_blank" rel="noopener noreferrer">
-  <h2>Explore the World of Cybersecurity</h2>
-</a>
-<a href="https://simeononsecurity.ch" target="_blank" rel="noopener noreferrer">
-  <img src="https://simeononsecurity.ch/img/banner.png" alt="SimeonOnSecurity Logo" width="300" height="300">
-</a>
 
-### Links:
-- #### [github.com/simeononsecurity](https://github.com/simeononsecurity)
-- #### [simeononsecurity.ch](https://simeononsecurity.ch)
+The default uses `AuditOnly` for each packaged collection. Existing enforced collections cause audit application to stop before changes, preventing an accidental downgrade. Existing rules are merged with the supplied rules.
+
+After checking audit events and application compatibility, explicitly select enforcement:
+
+```powershell
+.\sos-applockerhardening.ps1 -EnforcementMode Enabled -BackupPath C:\Recovery\applocker-before-enforcement.json
+```
+
+The default backup location is a timestamped JSON file under `%ProgramData%\SoS-AppLocker`. Choose a fresh backup path for each application. Existing backups are never overwritten.
+
+## Policy tests
+
+The script calls `Test-AppLockerPolicy` before deployment and against effective policy afterward. Default paths cover Windows PowerShell and Explorer. Supply your workload and user or SID:
+
+```powershell
+.\sos-applockerhardening.ps1 -TestPath C:\Apps\Example.exe -TestUser 'S-1-1-0' -BackupPath C:\Recovery\app-test.json
+```
+
+Review the returned allow/deny decisions. Sample paths do not establish compatibility for all applications. Completion requires matching rule content, collection modes, and the expected service state.
+
+## Export and restore
+
+```powershell
+.\sos-applockerhardening.ps1 -Mode Export -BackupPath C:\Recovery\applocker-export.json
+.\sos-applockerhardening.ps1 -Mode Restore -BackupPath C:\Recovery\applocker-before.json -WhatIf
+.\sos-applockerhardening.ps1 -Mode Restore -BackupPath C:\Recovery\applocker-before.json
+```
+
+The snapshot stores local policy XML and the Application Identity service's startup type and running state. Restore replaces the local policy with the snapshot, then restores and verifies service state. Domain policy is outside this snapshot. A failure retains the backup and returns a nonzero exit code.
+
+Recovery replaces local changes made after the snapshot. Keep backups local to the source machine. Older installations have no snapshot from this version. Exporting now captures the current policy, not the policy before an older script ran.
+
+## Validation
+
+```powershell
+pwsh -NoProfile -File tests/Regression.ps1
+```
+
+Tests use mocked AppLocker and service commands. They cover audit defaults, backups, restoration, policy test calls, existing enforcement conflicts, WhatIf, and ignored policy writes. CI runs Windows PowerShell 5.1 and PowerShell 7. Native policy normalization, service permissions, reboot behavior, and domain precedence require a Windows VM acceptance pass before release.
